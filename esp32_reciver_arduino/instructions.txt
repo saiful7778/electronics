@@ -1,0 +1,54 @@
+1. for i2c liquidisplay
+	#include <LiquidCrystal_I2C.h>
+	LiquidCrystal_I2C lcd(0x27, 16, 2);
+	lcd.begin();
+  	lcd.backlight();
+  	lcd.clear();
+  	lcd.setCursor(0,0);
+  	lcd.print("text");
+ 2. for ir remote
+ 	#include <IRremote.h>
+ 	const int RECV_PIN = 13;
+ 	IRrecv irrecv(RECV_PIN);
+	decode_results results;
+	irrecv.enableIRIn();
+	if (irrecv.decode(&results)){
+	const value = (results.value, HEX);
+	irrecv.resume();
+	}
+3. for wifi serial
+	#include <WiFi.h>
+	#include <AsyncTCP.h>
+	#include <ESPAsyncWebServer.h>
+	#include <WebSerial.h>
+	const char* ssid = "DTR - Dream To Real";          // Your WiFi SSID
+	const char* password = "#8426#DoNoT";  // Your WiFi Password
+	WiFi.mode(WIFI_STA);
+  	WiFi.begin(ssid, password);
+	if (WiFi.waitForConnectResult() != WL_CONNECTED) {
+	    Serial.printf("WiFi Failed!\n");
+	    return;
+	  }
+	Serial.print("IP Address: ");
+	Serial.println(WiFi.localIP());
+	  // WebSerial is accessible at "<IP Address>/webserial" in browser
+	WebSerial.begin(&server);
+	server.begin();
+	WebSerial.println(Serial.read());
+4. for bluetooth serial
+	#include <BluetoothSerial.h>
+	BluetoothSerial SerialBT;
+	
+	#if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
+	#error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
+	#endif
+
+	#if !defined(CONFIG_BT_SPP_ENABLED)
+	#error Serial Bluetooth not available or not enabled. It is only available for the ESP32
+	chip.
+	#endif
+	SerialBT.begin("ESP32test"); //Bluetooth device name
+  	Serial.println("The device started, now you can pair it with bluetooth!");
+  	SerialBT.write(Serial.read());
+
+	
