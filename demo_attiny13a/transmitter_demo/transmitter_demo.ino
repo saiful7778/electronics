@@ -24,7 +24,7 @@ void infrared(){
     if((custom>>(7-i))&1){_delay_us(1686);}else{_delay_us(562);}
   }
 
-  if(~PINB & 0x02){data=0x01;} //PB1 Turn on
+  if(~PINB & 0x02){data=0xFF30CF;} //PB1 Turn on
   if(~PINB & 0x04){data=0x02;} //PB2 Turn on
   if(~PINB & 0x08){data=0x03;} //PB3 Turn on
   if(~PINB & 0x10){data=0x04;} //PB4 Turn on
@@ -48,14 +48,14 @@ int main( void ){
   CLKPR =0b10000000; //Prescaler Change Enable
   CLKPR =0b00000000; //Div1(9.6MHz)
 
-  DDRB  =0b00000001; //PB0:Infrared LED
-  PORTB =0b00011110; //PB4-1:Switch
+//  DDRB  =0b00000001; //PB0:Infrared LED
+  PORTB =0b00000010; //PB4-1:Switch
 
   TCCR0A=0b10000011; //Subcarrier
   TCCR0B=0b00000001;
 
   GIMSK =0b00100000; //PCINT Enable
-  PCMSK =0b00011110; //PCINT4-1
+  PCMSK =0b00000010; //PCINT4-1
   MCUCR =0b00110000; //Sleep Enable, Power Down Mode
   sei();
 

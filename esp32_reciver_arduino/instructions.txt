@@ -1,11 +1,16 @@
+(*) Install esp32 in arduino:
+	1. Add this link: https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+	2. Download esp32 board manager.
+	3. Now we are able to upload code in esp32.
+	
+(*) Setup for the library:
 1. for i2c liquidisplay
 	#include <LiquidCrystal_I2C.h>
 	LiquidCrystal_I2C lcd(0x27, 16, 2);
 	lcd.begin();
   	lcd.backlight();
-  	lcd.clear();
   	lcd.setCursor(0,0);
-  	lcd.print("text");
+  	lcd.print("Saiful Islam");
  2. for ir remote
  	#include <IRremote.h>
  	const int RECV_PIN = 13;
@@ -14,6 +19,7 @@
 	irrecv.enableIRIn();
 	if (irrecv.decode(&results)){
 	const value = (results.value, HEX);
+	const value = (results.value, DEC);
 	irrecv.resume();
 	}
 3. for wifi serial
@@ -23,17 +29,18 @@
 	#include <WebSerial.h>
 	const char* ssid = "DTR - Dream To Real";          // Your WiFi SSID
 	const char* password = "#8426#DoNoT";  // Your WiFi Password
+	AsyncWebServer server(80);
 	WiFi.mode(WIFI_STA);
   	WiFi.begin(ssid, password);
-	if (WiFi.waitForConnectResult() != WL_CONNECTED) {
-	    Serial.printf("WiFi Failed!\n");
-	    return;
-	  }
-	Serial.print("IP Address: ");
-	Serial.println(WiFi.localIP());
-	  // WebSerial is accessible at "<IP Address>/webserial" in browser
-	WebSerial.begin(&server);
-	server.begin();
+  	if (WiFi.waitForConnectResult() != WL_CONNECTED) {
+    		Serial.printf("WiFi Failed!\n");
+    		return;
+  	}
+  	Serial.print("IP Address: ");
+  	Serial.println(WiFi.localIP());
+  	// WebSerial is accessible at "<IP Address>/webserial" in browser
+  	WebSerial.begin(&server);
+  	server.begin();
 	WebSerial.println(Serial.read());
 4. for bluetooth serial
 	#include <BluetoothSerial.h>
@@ -50,5 +57,232 @@
 	SerialBT.begin("ESP32test"); //Bluetooth device name
   	Serial.println("The device started, now you can pair it with bluetooth!");
   	SerialBT.write(Serial.read());
+5. Show code in webserial
+	WebSerial.print("DEC:  ");
+     	WebSerial.print((String(results.value)));
+     	WebSerial.print("   ");
+     	WebSerial.print("HEX: ");
+     	WebSerial.print((String(results.value, HEX)));
+     	WebSerial.print("   ");
+     	WebSerial.print("BIN: ");
+     	WebSerial.println((String(results.value, BIN)));
+     	delay(10);
+ 6. show code in serial termianl
+ 	Serial.print("DEC: ");
+     	Serial.print(results.value, DEC);
+     	Serial.print("   ");
+     	Serial.print("HEX: ");
+     	Serial.print(results.value, HEX);
+     	Serial.print("   ");
+     	Serial.print("BIN: ");
+     	Serial.println(results.value, BIN);
+     	delay(10);
+ 7. show code in lcd display
+ 	lcd.clear();
+	lcd.setCursor(0,0);
+	lcd.print("DEC:");
+	lcd.setCursor(5,0);
+	lcd.print(results.value, DEC);
+	lcd.setCursor(0,1);
+	lcd.print("HEX: 0x");
+	lcd.setCursor(7,1);
+	lcd.print(results.value, HEX);
+	delay(10);
+8. automatic lcd off fucntion:
+	*NOTE: do not insert lcd.backlight() in setup function
+	void lcdOff(int delayValue){
+  		delay(delayValue);
+  		lcd.noBacklight();
+	}
 
-	
+9. recive from webserial
+	  void recvMsg(uint8_t *data, size_t len){
+	  WebSerial.println("Received Data...");
+	  String d = "";
+	  for(int i=0; i < len; i++){
+	    d += char(data[i]);
+	  }
+	  WebSerial.println(d);
+	  if (d == "1 on"){
+	    digitalWrite(relay_1, HIGH);
+	    WebSerial.println("relay_1 on");
+	  }
+	  if (d=="1 off"){
+	    digitalWrite(relay_1, LOW);
+	    WebSerial.println("relay_1 off");
+	  }
+	}
+	//in setup function
+	WebSerial.msgCallback(recvMsg);
+10. Control device by IR remote:
+	switch(results.value){
+      case 0xFF30CF:
+        if(togglestate_1 == 0){
+          digitalWrite(relay_1, HIGH);
+          delay(10);
+          lcd.clear();
+          lcd.setCursor(0,0);
+          lcd.print("Relay 1 ON");
+          delay(10);
+          WebSerial.println("Relay 1 ON");
+          togglestate_1 = 1;
+        }else{
+          digitalWrite(relay_1, LOW);
+          delay(10);
+          lcd.clear();
+          lcd.setCursor(0,0);
+          lcd.print("Relay 1 OFF");
+          delay(10);
+          WebSerial.println("Relay 1 OFF");
+          togglestate_1 = 0;
+        }
+        break;
+      case 0xFF18E7:
+        if(togglestate_2 == 0){
+          digitalWrite(relay_2, HIGH);
+          delay(10);
+          lcd.clear();
+          lcd.setCursor(0,0);
+          lcd.print("Relay 2 ON");
+          delay(10);
+          WebSerial.println("Relay 2 ON");
+          togglestate_2 = 1;
+        }else{
+          digitalWrite(relay_2, LOW);
+          delay(10);
+          lcd.clear();
+          lcd.setCursor(0,0);
+          lcd.print("Relay 2 OFF");
+          delay(10);
+          WebSerial.println("Relay 2 OFF");
+          togglestate_2 = 0;
+        }
+        break;
+      case 0xFF7A85:
+      if(togglestate_3 == 0){
+          digitalWrite(relay_3, HIGH);
+          delay(10);
+          lcd.clear();
+          lcd.setCursor(0,0);
+          lcd.print("Relay 3 ON");
+          delay(10);
+          WebSerial.println("Relay 3 ON");
+          togglestate_3 = 1;
+        }else{
+          digitalWrite(relay_3, LOW);
+          delay(10);
+          lcd.clear();
+          lcd.setCursor(0,0);
+          lcd.print("Relay 3 OFF");
+          delay(10);
+          WebSerial.println("Relay 3 OFF");
+          togglestate_3 = 0;
+        }
+        break;
+      case 0xFF10EF:
+        if(togglestate_4 == 0){
+            digitalWrite(relay_4, HIGH);
+            delay(10);
+            lcd.clear();
+            lcd.setCursor(0,0);
+            lcd.print("Relay 4 ON");
+            delay(10);
+            WebSerial.println("Relay 4 ON");
+            togglestate_4 = 1;
+          }else{
+            digitalWrite(relay_4, LOW);
+            delay(10);
+            lcd.clear();
+            lcd.setCursor(0,0);
+            lcd.print("Relay 4 OFF");
+            delay(10);
+            WebSerial.println("Relay 4 OFF");
+            togglestate_4 = 0;
+          }
+        break;
+     }
+11. control device by webserial:
+	if(d == "relay 1"){
+    if(togglestate_1 == 0){
+          digitalWrite(relay_1, HIGH);
+          delay(10);
+          lcd.clear();
+          lcd.setCursor(0,0);
+          lcd.print("Relay 1 ON");
+          delay(10);
+          WebSerial.println("Relay 1 ON");
+          togglestate_1 = 1;
+        }else{
+          digitalWrite(relay_1, LOW);
+          delay(10);
+          lcd.clear();
+          lcd.setCursor(0,0);
+          lcd.print("Relay 1 OFF");
+          delay(10);
+          WebSerial.println("Relay 1 OFF");
+          togglestate_1 = 0;
+        }
+  }
+  if(d == "relay 2"){
+    if(togglestate_2 == 0){
+          digitalWrite(relay_2, HIGH);
+          delay(10);
+          lcd.clear();
+          lcd.setCursor(0,0);
+          lcd.print("Relay 2 ON");
+          delay(10);
+          WebSerial.println("Relay 2 ON");
+          togglestate_2 = 1;
+        }else{
+          digitalWrite(relay_2, LOW);
+          delay(10);
+          lcd.clear();
+          lcd.setCursor(0,0);
+          lcd.print("Relay 2 OFF");
+          delay(10);
+          WebSerial.println("Relay 2 OFF");
+          togglestate_2 = 0;
+        }
+  }
+  if(d == "relay 3"){
+    if(togglestate_3 == 0){
+          digitalWrite(relay_3, HIGH);
+          delay(10);
+          lcd.clear();
+          lcd.setCursor(0,0);
+          lcd.print("Relay 3 ON");
+          delay(10);
+          WebSerial.println("Relay 3 ON");
+          togglestate_3 = 1;
+        }else{
+          digitalWrite(relay_3, LOW);
+          delay(10);
+          lcd.clear();
+          lcd.setCursor(0,0);
+          lcd.print("Relay 3 OFF");
+          delay(10);
+          WebSerial.println("Relay 3 OFF");
+          togglestate_3 = 0;
+        }
+  }
+  if(d == "relay 4"){
+    if(togglestate_4 == 0){
+            digitalWrite(relay_4, HIGH);
+            delay(10);
+            lcd.clear();
+            lcd.setCursor(0,0);
+            lcd.print("Relay 4 ON");
+            delay(10);
+            WebSerial.println("Relay 4 ON");
+            togglestate_4 = 1;
+          }else{
+            digitalWrite(relay_4, LOW);
+            delay(10);
+            lcd.clear();
+            lcd.setCursor(0,0);
+            lcd.print("Relay 4 OFF");
+            delay(10);
+            WebSerial.println("Relay 1 OFF");
+            togglestate_4 = 0;
+          }
+  }
