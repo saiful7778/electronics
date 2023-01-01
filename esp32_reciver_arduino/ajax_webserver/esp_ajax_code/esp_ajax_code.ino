@@ -5,6 +5,9 @@
 #include <WiFiClient.h>
 #include <WebServer.h>
 #include "webpage.h"
+#include <LiquidCrystal_I2C.h>
+
+LiquidCrystal_I2C lcd(0x27, 16, 2);
 //---------------------------------------------------
 WebServer server(80);
 const char* ssid = "DTR - Dream To Real";
@@ -14,6 +17,7 @@ const char* password = "#8426#DoNoT";
 //===================================================
 void setup()
 {
+  lcd.begin();
   Serial.begin(115200);
   //-------------------------------------------------
   WiFi.mode(WIFI_STA);
@@ -34,5 +38,9 @@ void setup()
 //===================================================
 void loop(void)
 {
+  lcd.backlight();
+  lcd.setCursor(0,0);
+  lcd.print(WiFi.localIP());
   server.handleClient(); delay(1);
+  lcd.noBacklight();
 }
