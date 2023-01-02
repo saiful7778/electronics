@@ -1,3 +1,57 @@
+const char erroeCode[] PROGMEM = R"=====(
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DTR-Home automation</title>
+    <style>
+        body {
+        background: #222222;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        margin: 10px auto;
+        width: 80%;
+        background: #121212;
+        border-radius: 5px;
+        padding: 30px;
+      }
+      h1{
+        text-align: center;
+        font-family: Arial, Helvetica, sans-serif;
+        color: #ffffff;
+      }
+      p{
+        margin-top: 30px;
+        text-align: center;
+        font-family: Arial, Helvetica, sans-serif;
+        color: #ffffff;
+        font-size: 14px;
+        font-weight: 400;
+      }
+      a{
+        color: cyan;
+      }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>404! not found</h1>
+        <p>Go to <a id="site_url"></a></p>
+    </div>
+    <script>
+        document.getElementById("site_url").innerText = window.location.hostname;
+        document.getElementById("site_url").href = location.hostname;
+    </script>
+</body>
+</html>
+)=====";
+const char webpageCode[] PROGMEM = R"=====(
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -181,9 +235,9 @@
       connection.onmessage = function(event){
         let fullData = JSON.parse(event.data);
         if(fullData.relay_1 == 0){btn_status_1.innerHTML = "off";}else if(fullData.relay_1 == 1){btn_status_1.innerHTML == "on";};
-        if(fullData.relay_2 == 0){btn_status_2.innerHTML = "off";}else if(fullData.relay_1 == 1){btn_status_2.innerHTML == "on";};
-        if(fullData.relay_3 == 0){btn_status_3.innerHTML = "off";}else if(fullData.relay_1 == 1){btn_status_3.innerHTML == "on";};
-        if(fullData.relay_4 == 0){btn_status_4.innerHTML = "off";}else if(fullData.relay_1 == 1){btn_status_4.innerHTML == "on";};
+        if(fullData.relay_2 == 0){btn_status_2.innerHTML = "off";}else if(fullData.relay_2 == 1){btn_status_2.innerHTML == "on";};
+        if(fullData.relay_3 == 0){btn_status_3.innerHTML = "off";}else if(fullData.relay_3 == 1){btn_status_3.innerHTML == "on";};
+        if(fullData.relay_4 == 0){btn_status_4.innerHTML = "off";}else if(fullData.relay_4 == 1){btn_status_4.innerHTML == "on";};
       };
       if(btn_status_1.innerHTML == "off"){btn_status_1.classList.add("status_style");}else{btn_status_1.classList.remove("status_style");}
       if(btn_status_2.innerHTML == "off"){btn_status_2.classList.add("status_style");}else{btn_status_2.classList.remove("status_style");}
@@ -244,3 +298,4 @@
     </script>
   </body>
 </html>
+)=====";
